@@ -4,7 +4,7 @@ CREATE OR REPLACE FUNCTION posts.tr_f_update_vote() RETURNS trigger AS $emp_stam
 			IF NEW.negative THEN
 				UPDATE posts.posts SET downvotes = downvotes+1 WHERE post_id = NEW.post;
 			ELSE
-				UPDATE posts.posts SET upvotes = upvotes-1 WHERE post_id = NEW.post;
+				UPDATE posts.posts SET upvotes = upvotes+1 WHERE post_id = NEW.post;
 			END IF;
         ELSIF TG_OP = 'DELETE' THEN
 			IF OLD.negative THEN

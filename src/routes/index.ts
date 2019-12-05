@@ -22,6 +22,7 @@ router.get('/:post_id/comments', getPostComments);
 router.post('/', authenticated, createPost);
 router.post('/:post_id/comment', authenticated, createPostComment);
 router.put('/:post_id', authenticated, editPost);
+router.put('/:post_id/vote', authenticated, voteForPost);
 router.put('/comment/:comment_id', authenticated, editPostComment);
 router.delete('/:post_id', authenticated, deletePost);
 router.delete('/comment/:comment_id', authenticated, deleteComment);
@@ -32,9 +33,10 @@ export const MainRouter: Router = router;
  *  Functions
  * ------------------------------- */
 
-function getPosts(type: 'all'|'permanent'|'temporary')
+function getPosts(type: 'all' | 'permanent' | 'temporary')
 {
-    return async (req: Request, res: Response) => {
+    return async (req: Request, res: Response) =>
+    {
         if (!new QueryValidator()
             .inclusion('sort', false, ['ts', 'upvotes', 'downvotes'])
             .inclusion('order', false, ['asc', 'desc'])
@@ -99,10 +101,9 @@ async function createPost(req: Request, res: Response)
 
     try
     {
-        // TODO: author_id
         const results = await query(`
             INSERT INTO posts.posts (author, title, content, expiration) VALUES ($1, $2, $3, $4) RETURNING post_id`,
-            [1, req.body.title, req.body.content, req.body.expiration]);
+            [req.decoded.id, req.body.title, req.body.content, req.body.expiration]);
 
         res.status(200).json({
             data: results.rows[0]
@@ -133,7 +134,7 @@ async function editPost(req: Request, res: Response)
             return;
         }
 
-        if (checkResult.rows[0].author !== 1) // TODO: use authenticated user
+        if (checkResult.rows[0].author !== req.decoded.id)
         {
             res.status(403).json({
                 error: "Cannot edit this post"
@@ -169,7 +170,7 @@ async function editPost(req: Request, res: Response)
             WHERE post_id = $1
         `, params);
 
-        res.status(200).json({});
+        res.status(204).end();;
     }
     catch (err)
     {
@@ -195,7 +196,7 @@ async function deletePost(req: Request, res: Response)
             return;
         }
 
-        if (checkResult.rows[0].author !== 1) // TODO: use authenticated user
+        if (checkResult.rows[0].author !== req.decoded.id)
         {
             res.status(403).json({
                 error: "Cannot edit this post"
@@ -204,7 +205,7 @@ async function deletePost(req: Request, res: Response)
         }
         await query(`DELETE FROM posts.posts WHERE post_id = $1`, [postId]);
 
-        res.status(200).json({});
+        res.status(204).end();
     }
     catch (err)
     {
@@ -277,10 +278,9 @@ async function createPostComment(req: Request, res: Response)
 
     try
     {
-        // TODO: author_id
         const results = await query(`
             INSERT INTO posts.comments (author, post, content) VALUES ($1, $2, $3) RETURNING comment_id`,
-            [1, postId, req.body.content]);
+            [req.decoded.id, postId, req.body.content]);
 
         res.status(200).json({
             data: results.rows[0]
@@ -311,7 +311,7 @@ async function editPostComment(req: Request, res: Response)
             return;
         }
 
-        if (checkResult.rows[0].author !== 1) // TODO: use authenticated user
+        if (checkResult.rows[0].author !== req.decoded.id)
         {
             res.status(403).json({
                 error: "Cannot delete this Comment"
@@ -322,7 +322,7 @@ async function editPostComment(req: Request, res: Response)
         await query(`UPDATE posts.comments SET content = $2 WHERE comment_id = $1`,
             [commentId, req.body.content]);
 
-        res.status(200).json({});
+        res.status(204).end();
     }
     catch (err)
     {
@@ -348,7 +348,7 @@ async function deleteComment(req: Request, res: Response)
             return;
         }
 
-        if (checkResult.rows[0].author !== 1) // TODO: use authenticated user
+        if (checkResult.rows[0].author !== req.decoded.id)
         {
             res.status(403).json({
                 error: "Cannot delete this comment"
@@ -357,7 +357,38 @@ async function deleteComment(req: Request, res: Response)
         }
         await query(`DELETE FROM posts.comments WHERE comment_id = $1`, [commentId]);
 
-        res.status(200).json({});
+        res.status(204).end();
+    }
+    catch (err)
+    {
+        databaseError(res, err);
+    }
+}
+
+async function voteForPost(req: Request, res: Response)
+{
+    if (!new QueryValidator().id('post_id', true).check(req.params, res)) return;
+    if (!new BodyValidator().boolean('negative', false).check(req.body, res)) return;
+
+    const postId = parseInt(req.params.post_id, 10);
+    const negative = req.body.negative === undefined ? false : req.body.negative;
+
+    try
+    {
+        const checkResult = await query(`SELECT author FROM posts.posts WHERE post_id = $1`, [postId])
+
+        if (checkResult.rowCount == 0)
+        {
+            res.status(404).json({
+                error: "Post not found"
+            });
+            return;
+        }
+
+        await query(`
+            INSERT INTO posts.posts_votes (post, author, negative) VALUES ($1, $2, $3)
+            ON CONFLICT ON CONSTRAINT posts_votes_pkey DO UPDATE SET negative=$3`, [postId, req.decoded.id, negative]);
+        res.status(204).end();
     }
     catch (err)
     {

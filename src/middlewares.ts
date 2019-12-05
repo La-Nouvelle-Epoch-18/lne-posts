@@ -22,7 +22,9 @@ export async function authenticated(req: Request, res: Response, next: NextFunct
             })
             if (result.statusCode == 200)
             {
-                const data = jwt.decode(token);
+                const data: any = jwt.decode(token) || {};
+                data['id'] = 1;
+                req.decoded = data;
                 console.log(data);
                 next();
             }
