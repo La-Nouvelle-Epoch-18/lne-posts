@@ -1,7 +1,7 @@
 version: '3'
 services:
   lne-posts:
-    image: nom-image
+    image: lne-posts-image
     env_file:
       - ./environment
     restart: always

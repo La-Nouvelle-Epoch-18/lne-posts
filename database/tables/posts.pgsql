@@ -25,3 +25,6 @@ ALTER TABLE posts.posts
 
 ALTER TABLE posts.posts
     ADD COLUMN downvotes integer NOT NULL DEFAULT 0;
+
+ALTER TABLE posts.posts
+    ADD COLUMN expiration timestamp with time zone;

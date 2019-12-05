@@ -5,6 +5,7 @@ import { Router } from 'express-serve-static-core';
 
 import { query } from '../db';
 import { databaseError } from '../util';
+import { authenticated } from '../middlewares';
 import { QueryValidator, BodyValidator } from '../validator';
 
 /* ------------------------------- *
@@ -12,16 +13,18 @@ import { QueryValidator, BodyValidator } from '../validator';
  * ------------------------------- */
 const router = express.Router();
 
-router.get('/', getPosts);
+router.get('/', getPosts('all'));
+router.get('/temporary', getPosts('temporary'));
+router.get('/permanent', getPosts('permanent'));
 router.get('/comment/:comment_id', getComment);
 router.get('/:post_id', getPost);
 router.get('/:post_id/comments', getPostComments);
-router.post('/', createPost);
-router.post('/:post_id/comment', createPostComment);
-router.put('/:post_id', editPost);
-router.put('/comment/:comment_id', editPostComment);
-router.delete('/:post_id', deletePost);
-router.delete('/comment/:comment_id', deleteComment);
+router.post('/', authenticated, createPost);
+router.post('/:post_id/comment', authenticated, createPostComment);
+router.put('/:post_id', authenticated, editPost);
+router.put('/comment/:comment_id', authenticated, editPostComment);
+router.delete('/:post_id', authenticated, deletePost);
+router.delete('/comment/:comment_id', authenticated, deleteComment);
 
 export const MainRouter: Router = router;
 
@@ -29,37 +32,40 @@ export const MainRouter: Router = router;
  *  Functions
  * ------------------------------- */
 
-async function getPosts(req: Request, res: Response)
+function getPosts(type: 'all'|'permanent'|'temporary')
 {
-    if (!new QueryValidator()
-        .inclusion('sort', false, ['ts', 'upvotes', 'downvotes'])
-        .inclusion('order', false, ['asc', 'desc'])
-        .number('page', false, 0)
-        .number('items', false, 1)
-        .check(req.query, res)) return;
+    return async (req: Request, res: Response) => {
+        if (!new QueryValidator()
+            .inclusion('sort', false, ['ts', 'upvotes', 'downvotes'])
+            .inclusion('order', false, ['asc', 'desc'])
+            .number('page', false, 0)
+            .number('items', false, 1)
+            .check(req.query, res)) return;
 
-    const sort = req.query.sort || 'ts';
-    const order = req.query.order || 'desc';
-    const page = req.query.page !== undefined ? parseInt(req.query.page, 10) : 0;
-    const items = req.query.items !== undefined ? parseInt(req.query.items, 10) : 20;
+        const sort = req.query.sort || 'ts';
+        const order = req.query.order || 'desc';
+        const page = req.query.page !== undefined ? parseInt(req.query.page, 10) : 0;
+        const items = req.query.items !== undefined ? parseInt(req.query.items, 10) : 20;
 
-    try
-    {
-        const results = await query(`
-            SELECT post_id, author, title, SUBSTRING(content, 1, 80) AS content, ts, upvotes, downvotes
-            FROM posts.posts
-            ORDER BY ${sort} ${order}
-            LIMIT $1
-            OFFSET $2`,
-            [items, page]);
+        try
+        {
+            const results = await query(`
+                SELECT post_id, author, title, SUBSTRING(content, 1, 80) AS content, ts, upvotes, downvotes
+                FROM posts.posts
+                ${type == 'permanent' ? 'WHERE expiration IS NULL' : type == 'temporary' ? 'WHERE expiration IS NOT NULL' : ''}
+                ORDER BY ${sort} ${order}
+                LIMIT $1
+                OFFSET $2`,
+                [items, page]);
 
-        res.status(200).json({
-            data: results.rows
-        });
-    }
-    catch (err)
-    {
-        databaseError(res, err);
+            res.status(200).json({
+                data: results.rows
+            });
+        }
+        catch (err)
+        {
+            databaseError(res, err);
+        }
     }
 }
 
@@ -89,14 +95,14 @@ async function getPost(req: Request, res: Response)
 
 async function createPost(req: Request, res: Response)
 {
-    if (!new BodyValidator().str('title', true, 255).str('content', true).check(req.body, res)) return;
+    if (!new BodyValidator().str('title', true, 255).str('content', true).date('expiration', false, false, true, true, false).check(req.body, res)) return;
 
     try
     {
         // TODO: author_id
         const results = await query(`
-            INSERT INTO posts.posts (author, title, content) VALUES ($1, $2, $3) RETURNING post_id`,
-            [1, req.body.title, req.body.content]);
+            INSERT INTO posts.posts (author, title, content, expiration) VALUES ($1, $2, $3, $4) RETURNING post_id`,
+            [1, req.body.title, req.body.content, req.body.expiration]);
 
         res.status(200).json({
             data: results.rows[0]
