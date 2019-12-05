@@ -50,7 +50,7 @@ function getPosts(type: 'all'|'permanent'|'temporary')
         try
         {
             const results = await query(`
-                SELECT post_id, author, title, SUBSTRING(content, 1, 80) AS content, ts, upvotes, downvotes
+                SELECT post_id, author, title, SUBSTRING(content, 1, 80) AS content, ts, upvotes, downvotes, expiration
                 FROM posts.posts
                 ${type == 'permanent' ? 'WHERE expiration IS NULL' : type == 'temporary' ? 'WHERE expiration IS NOT NULL' : ''}
                 ORDER BY ${sort} ${order}
@@ -78,7 +78,7 @@ async function getPost(req: Request, res: Response)
     try
     {
         const results = await query(`
-            SELECT post_id, author, title, content, ts, upvotes, downvotes
+            SELECT post_id, author, title, content, ts, upvotes, downvotes, expiration
             FROM posts.posts
             WHERE post_id = $1`,
             [postId]);

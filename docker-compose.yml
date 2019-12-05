@@ -7,12 +7,15 @@ services:
     restart: always
     depends_on:
       - database
+    ports:
+      - 80:8080
   database:
     image: postgres:10-alpine
     env_file:
       - ./environment
     volumes:
       - postgres-data:/var/lib/postgresql/data
+      - /home/ubuntu/posts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
     restart: always
 volumes:
   postgres-data: {}
