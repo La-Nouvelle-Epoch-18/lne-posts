@@ -1,0 +1,7 @@
+CREATE DATABASE lne
+    WITH 
+    OWNER = lne_user
+    ENCODING = 'UTF8'
+    CONNECTION LIMIT = -1;
+
+GRANT ALL ON DATABASE lne TO lne_user;
