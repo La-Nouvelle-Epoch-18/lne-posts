@@ -33,6 +33,72 @@ export const MainRouter: Router = router;
  *  Functions
  * ------------------------------- */
 
+ /**
+ * @api {get} / Get all posts
+ * @apiDescription Return all posts
+ * @apiName GetPosts
+ * @apiGroup Posts
+ * @apiVersion 1.0.0
+ *
+ * @apiParam (QueryParameters) {String{ts,upvotes,downvotes}} [sort] Property used to sort the data.
+ * @apiParam (QueryParameters) {String{asc,desc}} [order] Order in which to sort the data.
+ * @apiParam (QueryParameters) {Integer{0+}} [page] Page index to get.
+ * @apiParam (QueryParameters) {Integer{1+}} [items] Number of element per page.
+ *
+ * @apiSuccess (Success) {Object[]} data Array of objects containing data.
+ * @apiSuccess (Success) {Integer{1+}} data.post_id Identifier of the post.
+ * @apiSuccess (Success) {Integer{1+}} data.author Identifier of the author.
+ * @apiSuccess (Success) {String} data.title Title of the post.
+ * @apiSuccess (Success) {String} data.content Content of the post.
+ * @apiSuccess (Success) {String{DateTimeISO}} data.ts The date and time of the post.
+ * @apiSuccess (Success) {Integer{0+}} data.upvotes Number of upvotes.
+ * @apiSuccess (Success) {Integer{0+}} data.downvotes Number of downvotes.
+ * @apiSuccess (Success) {String{DateTimeISO}} data.expiration Expiration date and time of the post.
+ */
+ /**
+ * @api {get} /temporary Get temporary posts
+ * @apiDescription Return all temporary posts
+ * @apiName GetTemporaryPosts
+ * @apiGroup Posts
+ * @apiVersion 1.0.0
+ *
+ * @apiParam (QueryParameters) {String{ts,upvotes,downvotes}} [sort] Property used to sort the data.
+ * @apiParam (QueryParameters) {String{asc,desc}} [order] Order in which to sort the data.
+ * @apiParam (QueryParameters) {Integer{0+}} [page] Page index to get.
+ * @apiParam (QueryParameters) {Integer{1+}} [items] Number of element per page.
+ *
+ * @apiSuccess (Success) {Object[]} data Array of objects containing data.
+ * @apiSuccess (Success) {Integer{1+}} data.post_id Identifier of the post.
+ * @apiSuccess (Success) {Integer{1+}} data.author Identifier of the author.
+ * @apiSuccess (Success) {String} data.title Title of the post.
+ * @apiSuccess (Success) {String} data.content Content of the post.
+ * @apiSuccess (Success) {String{DateTimeISO}} data.ts The date and time of the post.
+ * @apiSuccess (Success) {Integer{0+}} data.upvotes Number of upvotes.
+ * @apiSuccess (Success) {Integer{0+}} data.downvotes Number of downvotes.
+ * @apiSuccess (Success) {String{DateTimeISO}} data.expiration Expiration date and time of the post.
+ */
+ /**
+ * @api {get} /permanent Get permanent posts
+ * @apiDescription Return all permanent posts
+ * @apiName GetPermanentPosts
+ * @apiGroup Posts
+ * @apiVersion 1.0.0
+ *
+ * @apiParam (QueryParameters) {String{ts,upvotes,downvotes}} [sort] Property used to sort the data.
+ * @apiParam (QueryParameters) {String{asc,desc}} [order] Order in which to sort the data.
+ * @apiParam (QueryParameters) {Integer{0+}} [page] Page index to get.
+ * @apiParam (QueryParameters) {Integer{1+}} [items] Number of element per page.
+ *
+ * @apiSuccess (Success) {Object[]} data Array of objects containing data.
+ * @apiSuccess (Success) {Integer{1+}} data.post_id Identifier of the post.
+ * @apiSuccess (Success) {Integer{1+}} data.author Identifier of the author.
+ * @apiSuccess (Success) {String} data.title Title of the post.
+ * @apiSuccess (Success) {String} data.content Content of the post. Max 80 chars.
+ * @apiSuccess (Success) {String{DateTimeISO}} data.ts The date and time of the post.
+ * @apiSuccess (Success) {Integer{0+}} data.upvotes Number of upvotes.
+ * @apiSuccess (Success) {Integer{0+}} data.downvotes Number of downvotes.
+ * @apiSuccess (Success) {Null} data.expiration Expiration date and time of the post.
+ */
 function getPosts(type: 'all' | 'permanent' | 'temporary')
 {
     return async (req: Request, res: Response) =>
@@ -71,6 +137,25 @@ function getPosts(type: 'all' | 'permanent' | 'temporary')
     }
 }
 
+ /**
+ * @api {get} /:id Get a post
+ * @apiDescription Return a post
+ * @apiName GetPost
+ * @apiGroup Posts
+ * @apiVersion 1.0.0
+ *
+ * @apiParam (UrlParameters) {Integer{1+}} id The post identifier.
+ *
+ * @apiSuccess (Success) {Object[]} data Array of objects containing data.
+ * @apiSuccess (Success) {Integer{1+}} data.post_id Identifier of the post.
+ * @apiSuccess (Success) {Integer{1+}} data.author Identifier of the author.
+ * @apiSuccess (Success) {String} data.title Title of the post.
+ * @apiSuccess (Success) {String} data.content Content of the post.
+ * @apiSuccess (Success) {String{DateTimeISO}} data.ts The date and time of the post.
+ * @apiSuccess (Success) {Integer{0+}} data.upvotes Number of upvotes.
+ * @apiSuccess (Success) {Integer{0+}} data.downvotes Number of downvotes.
+ * @apiSuccess (Success) {String/Null{DateTimeISO}} data.expiration Expiration date and time of the post.
+ */
 async function getPost(req: Request, res: Response)
 {
     if (!new QueryValidator().id('post_id', true).check(req.params, res)) return;
@@ -95,6 +180,22 @@ async function getPost(req: Request, res: Response)
     }
 }
 
+ /**
+ * @api {post} / Create a post
+ * @apiDescription Create a post
+ * @apiName PostPost
+ * @apiGroup Posts
+ * @apiVersion 1.0.0
+ *
+ * @apiPermission Authenticated
+ * 
+ * @apiParam (BodyParameters) {String{255}} title Title of the post.
+ * @apiParam (BodyParameters) {String} content Content of the post.
+ * @apiParam (BodyParameters) {String{DateTimeISO}} [expiration] Expiration date of the post.
+ *
+ * @apiSuccess (Success) {Object[]} data Object containing data.
+ * @apiSuccess (Success) {Integer{1+}} data.post_id Identifier of the post.
+ */
 async function createPost(req: Request, res: Response)
 {
     if (!new BodyValidator().str('title', true, 255).str('content', true).date('expiration', false, false, true, true, false).check(req.body, res)) return;
@@ -115,6 +216,20 @@ async function createPost(req: Request, res: Response)
     }
 }
 
+ /**
+ * @api {put} /:id Edit a post
+ * @apiDescription Edit a post
+ * @apiName PutPost
+ * @apiGroup Posts
+ * @apiVersion 1.0.0
+ *
+ * @apiPermission Authenticated
+ * 
+ * @apiParam (UrlParameters) {Integer{1+}} id Identifier of the post.
+ * 
+ * @apiParam (BodyParameters) {String{255}} [title] Title of the post.
+ * @apiParam (BodyParameters) {String} [content] Content of the post.
+ */
 async function editPost(req: Request, res: Response)
 {
     if (!new QueryValidator().id('post_id', true).check(req.params, res)) return;
@@ -178,6 +293,17 @@ async function editPost(req: Request, res: Response)
     }
 }
 
+ /**
+ * @api {delete} /:id Delete a post
+ * @apiDescription Delete a post
+ * @apiName DeletePost
+ * @apiGroup Posts
+ * @apiVersion 1.0.0
+ *
+ * @apiPermission Authenticated
+ * 
+ * @apiParam (UrlParameters) {Integer{1+}} id Identifier of the post.
+ */
 async function deletePost(req: Request, res: Response)
 {
     if (!new QueryValidator().id('post_id', true).check(req.params, res)) return;
@@ -213,6 +339,25 @@ async function deletePost(req: Request, res: Response)
     }
 }
 
+ /**
+ * @api {get} /:id/comments Get a post's comments
+ * @apiDescription Return all comments of a post
+ * @apiName GetComments
+ * @apiGroup Comments
+ * @apiVersion 1.0.0
+ *
+ * @apiParam (UrlParameters) {Integer{1+}} id Identifier of the post.
+ * 
+ * @apiParam (QueryParameters) {Integer{0+}} [page] Page index to get.
+ * @apiParam (QueryParameters) {Integer{1+}} [items] Number of element per page.
+ *
+ * @apiSuccess (Success) {Object[]} data Array of objects containing data.
+ * @apiSuccess (Success) {Integer{1+}} data.comment_id Identifier of the comment.
+ * @apiSuccess (Success) {Integer{1+}} data.post Identifier of the post.
+ * @apiSuccess (Success) {Integer{1+}} data.author Identifier of the author.
+ * @apiSuccess (Success) {String} data.content Content of the post.
+ * @apiSuccess (Success) {String{DateTimeISO}} data.ts The date and time of the post.
+ */
 async function getPostComments(req: Request, res: Response)
 {
     if (!new QueryValidator().id('post_id', true).check(req.params, res)) return;
@@ -245,6 +390,22 @@ async function getPostComments(req: Request, res: Response)
     }
 }
 
+ /**
+ * @api {get} /comment/:id Get a comment
+ * @apiDescription Return a comment
+ * @apiName GetComment
+ * @apiGroup Comments
+ * @apiVersion 1.0.0
+ *
+ * @apiParam (UrlParameters) {Integer{1+}} id Identifier of the comment.
+ * 
+ * @apiSuccess (Success) {Object} data Object containing data.
+ * @apiSuccess (Success) {Integer{1+}} data.comment_id Identifier of the comment.
+ * @apiSuccess (Success) {Integer{1+}} data.post Identifier of the post.
+ * @apiSuccess (Success) {Integer{1+}} data.author Identifier of the author.
+ * @apiSuccess (Success) {String} data.content Content of the post.
+ * @apiSuccess (Success) {String{DateTimeISO}} data.ts The date and time of the post.
+ */
 async function getComment(req: Request, res: Response)
 {
     if (!new QueryValidator().id('comment_id', true).check(req.params, res)) return;
@@ -269,6 +430,22 @@ async function getComment(req: Request, res: Response)
     }
 }
 
+ /**
+ * @api {post} /:id/comment Create a comment
+ * @apiDescription Create a comment
+ * @apiName PostComment
+ * @apiGroup Comments
+ * @apiVersion 1.0.0
+ *
+ * @apiPermission Authenticated
+ * 
+ * @apiParam (UrlParameters) {Integer{1+}} id Identifier of the post.
+ * 
+ * @apiParam (BodyParameters) {String} content Content of the comment.
+ *
+ * @apiSuccess (Success) {Object[]} data Object containing data.
+ * @apiSuccess (Success) {Integer{1+}} data.comment_id Identifier of the comment.
+ */
 async function createPostComment(req: Request, res: Response)
 {
     if (!new QueryValidator().id('post_id', true).check(req.params, res)) return;
@@ -292,6 +469,19 @@ async function createPostComment(req: Request, res: Response)
     }
 }
 
+/**
+ * @api {put} /comment/:id Edit a comment
+ * @apiDescription Edit a post
+ * @apiName PutComment
+ * @apiGroup Comments
+ * @apiVersion 1.0.0
+ *
+ * @apiPermission Authenticated
+ * 
+ * @apiParam (UrlParameters) {Integer{1+}} id Identifier of the comment.
+ * 
+ * @apiParam (BodyParameters) {String} content Content of the comment.
+ */
 async function editPostComment(req: Request, res: Response)
 {
     if (!new QueryValidator().id('comment_id', true).check(req.params, res)) return;
@@ -330,6 +520,17 @@ async function editPostComment(req: Request, res: Response)
     }
 }
 
+ /**
+ * @api {delete} /comment/:id Delete a comment
+ * @apiDescription Delete a comment
+ * @apiName DeleteComment
+ * @apiGroup Comments
+ * @apiVersion 1.0.0
+ *
+ * @apiPermission Authenticated
+ * 
+ * @apiParam (UrlParameters) {Integer{1+}} id Identifier of the comment.
+ */
 async function deleteComment(req: Request, res: Response)
 {
     if (!new QueryValidator().id('comment_id', true).check(req.params, res)) return;
@@ -365,6 +566,19 @@ async function deleteComment(req: Request, res: Response)
     }
 }
 
+/**
+ * @api {put} /:id/vote Vote for a post
+ * @apiDescription Vote for a post
+ * @apiName PutPostVote
+ * @apiGroup Posts
+ * @apiVersion 1.0.0
+ *
+ * @apiPermission Authenticated
+ * 
+ * @apiParam (UrlParameters) {Integer{1+}} id Identifier of the post.
+ * 
+ * @apiParam (BodyParameters) {Boolean} [negative] True when the vote is a downvote, false otherwise.
+ */
 async function voteForPost(req: Request, res: Response)
 {
     if (!new QueryValidator().id('post_id', true).check(req.params, res)) return;
