@@ -1,7 +1,7 @@
 version: '3'
 services:
   lne-posts:
-    image: lne-posts-image
+    image: nouvelle0epoch/lne-posts
     env_file:
       - ./environment
     restart: always

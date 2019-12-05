@@ -9,7 +9,7 @@ COPY package*.json ./
 RUN npm install --only=production
 
 # Bundle app source
-COPY dist ./
+COPY dist ./dist
 
 # default port
 EXPOSE 8080
