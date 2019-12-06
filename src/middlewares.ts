@@ -16,14 +16,13 @@ export async function authenticated(req: Request, res: Response, next: NextFunct
             const result = await requestP({
                 method: 'GET',
                 url: AUTH_SERVICE_URL,
-                headers:{
+                headers: {
                     "authorization": "Bearer " + token
                 }
             })
             if (result.statusCode == 200)
             {
-                const data: any = jwt.decode(token) || {};
-                data['id'] = 1;
+                const data: any = jwt.decode(token) || { id: 1 };
                 req.decoded = data;
                 console.log(data);
                 next();
@@ -35,7 +34,7 @@ export async function authenticated(req: Request, res: Response, next: NextFunct
                 });
             }
         }
-        catch(err)
+        catch (err)
         {
             console.log(err);
             res.status(500).json({
