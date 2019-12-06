@@ -39,7 +39,7 @@ jobs:
         KEY: ${{ secrets.PROD_KEY }}
       with:
         source: "docker-compose.yml"
-        target: ${{ secrets.DOCKER_COMPOSE_TARGET }}
+        target: "/home/ubuntu/posts"
     - name: Pull docker image
       uses: appleboy/ssh-action@master
       with:
@@ -55,5 +55,5 @@ jobs:
         username: ${{ secrets.PROD_USERNAME }}
         key: ${{ secrets.PROD_KEY }}
         port: ${{ secrets.PROD_PORT }}
-        script: sudo docker-compose restart
+        script: cd /home/ubuntu/posts && sudo docker-compose restart
       
