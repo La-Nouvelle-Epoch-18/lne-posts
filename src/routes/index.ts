@@ -580,49 +580,49 @@ async function voteForPost(req: Request, res: Response)
             return;
         }
 
-        let points = 0;
+        // let points = 0;
 
         const results = await query(`SELECT negative FROM posts.posts_votes WHERE post = $1 AND author = $2`, [postId, req.decoded.userId]);
         if (results.rowCount == 0)
         {
             await query(`INSERT INTO posts.posts_votes (post, author, negative) VALUES ($1, $2, $3)`, [postId, req.decoded.userId, negative]);
-            points = negative ? -1 : 1;
+            // points = negative ? -1 : 1;
         }
         else if (results.rows[0].negative != negative)
         {
             await query(`UPDATE posts.posts_votes SET negative = $3 WHERE post = $1 AND author = $2`, [postId, req.decoded.userId, negative]);
-            points = negative ? -2 : 2;
+            // points = negative ? -2 : 2;
         }
 
-        if (points != 0)
-        {
-            try
-            {
-                const response = await requestP({
-                    method: 'put',
-                    url: AUTH_SERVICE_URL,
-                    json: {
-                        increment: points
-                    }
-                });
+        // if (points != 0)
+        // {
+        //     try
+        //     {
+        //         const response = await requestP({
+        //             method: 'put',
+        //             url: AUTH_SERVICE_URL,
+        //             json: {
+        //                 increment: points
+        //             }
+        //         });
 
-                if (response.statusCode != 200)
-                {
-                    res.status(500).json({
-                        error: "Auth Service error"
-                    });
-                    return;
-                }
-            }
-            catch (err)
-            {
-                console.log(err);
-                res.status(500).json({
-                    error: "Auth Service error"
-                });
-                return;
-            }
-        }
+        //         if (response.statusCode != 200)
+        //         {
+        //             res.status(500).json({
+        //                 error: "Auth Service error"
+        //             });
+        //             return;
+        //         }
+        //     }
+        //     catch (err)
+        //     {
+        //         console.log(err);
+        //         res.status(500).json({
+        //             error: "Auth Service error"
+        //         });
+        //         return;
+        //     }
+        // }
 
         res.status(204).end();
     }
