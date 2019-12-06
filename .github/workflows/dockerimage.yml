@@ -25,7 +25,7 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
 
   deploy:
-
+    needs: build
     runs-on: ubuntu-latest
       
     steps:
