@@ -46,15 +46,14 @@ export const MainRouter: Router = router;
 * @apiParam (QueryParameters) {Integer{0+}} [page] Page index to get.
 * @apiParam (QueryParameters) {Integer{1+}} [items] Number of element per page.
 *
-* @apiSuccess (Success) {Object[]} data Array of objects containing data.
-* @apiSuccess (Success) {Integer{1+}} data.post_id Identifier of the post.
-* @apiSuccess (Success) {Integer{1+}} data.author Identifier of the author.
-* @apiSuccess (Success) {String} data.title Title of the post.
-* @apiSuccess (Success) {String} data.content Content of the post.
-* @apiSuccess (Success) {String{DateTimeISO}} data.ts The date and time of the post.
-* @apiSuccess (Success) {Integer{0+}} data.upvotes Number of upvotes.
-* @apiSuccess (Success) {Integer{0+}} data.downvotes Number of downvotes.
-* @apiSuccess (Success) {String{DateTimeISO}} data.expiration Expiration date and time of the post.
+* @apiSuccess (Success) {Integer{1+}} post_id Identifier of the post.
+* @apiSuccess (Success) {Integer{1+}} author Identifier of the author.
+* @apiSuccess (Success) {String} title Title of the post.
+* @apiSuccess (Success) {String} content Content of the post.
+* @apiSuccess (Success) {String{DateTimeISO}} ts The date and time of the post.
+* @apiSuccess (Success) {Integer{0+}} upvotes Number of upvotes.
+* @apiSuccess (Success) {Integer{0+}} downvotes Number of downvotes.
+* @apiSuccess (Success) {String{DateTimeISO}} expiration Expiration date and time of the post.
 */
 /**
 * @api {get} /temporary Get temporary posts
@@ -68,15 +67,14 @@ export const MainRouter: Router = router;
 * @apiParam (QueryParameters) {Integer{0+}} [page] Page index to get.
 * @apiParam (QueryParameters) {Integer{1+}} [items] Number of element per page.
 *
-* @apiSuccess (Success) {Object[]} data Array of objects containing data.
-* @apiSuccess (Success) {Integer{1+}} data.post_id Identifier of the post.
-* @apiSuccess (Success) {Integer{1+}} data.author Identifier of the author.
-* @apiSuccess (Success) {String} data.title Title of the post.
-* @apiSuccess (Success) {String} data.content Content of the post.
-* @apiSuccess (Success) {String{DateTimeISO}} data.ts The date and time of the post.
-* @apiSuccess (Success) {Integer{0+}} data.upvotes Number of upvotes.
-* @apiSuccess (Success) {Integer{0+}} data.downvotes Number of downvotes.
-* @apiSuccess (Success) {String{DateTimeISO}} data.expiration Expiration date and time of the post.
+* @apiSuccess (Success) {Integer{1+}} post_id Identifier of the post.
+* @apiSuccess (Success) {Integer{1+}} author Identifier of the author.
+* @apiSuccess (Success) {String} title Title of the post.
+* @apiSuccess (Success) {String} content Content of the post.
+* @apiSuccess (Success) {String{DateTimeISO}} ts The date and time of the post.
+* @apiSuccess (Success) {Integer{0+}} upvotes Number of upvotes.
+* @apiSuccess (Success) {Integer{0+}} downvotes Number of downvotes.
+* @apiSuccess (Success) {String{DateTimeISO}} expiration Expiration date and time of the post.
 */
 /**
 * @api {get} /permanent Get permanent posts
@@ -90,15 +88,14 @@ export const MainRouter: Router = router;
 * @apiParam (QueryParameters) {Integer{0+}} [page] Page index to get.
 * @apiParam (QueryParameters) {Integer{1+}} [items] Number of element per page.
 *
-* @apiSuccess (Success) {Object[]} data Array of objects containing data.
-* @apiSuccess (Success) {Integer{1+}} data.post_id Identifier of the post.
-* @apiSuccess (Success) {Integer{1+}} data.author Identifier of the author.
-* @apiSuccess (Success) {String} data.title Title of the post.
-* @apiSuccess (Success) {String} data.content Content of the post. Max 80 chars.
-* @apiSuccess (Success) {String{DateTimeISO}} data.ts The date and time of the post.
-* @apiSuccess (Success) {Integer{0+}} data.upvotes Number of upvotes.
-* @apiSuccess (Success) {Integer{0+}} data.downvotes Number of downvotes.
-* @apiSuccess (Success) {Null} data.expiration Expiration date and time of the post.
+* @apiSuccess (Success) {Integer{1+}} post_id Identifier of the post.
+* @apiSuccess (Success) {Integer{1+}} author Identifier of the author.
+* @apiSuccess (Success) {String} title Title of the post.
+* @apiSuccess (Success) {String} content Content of the post. Max 80 chars.
+* @apiSuccess (Success) {String{DateTimeISO}} ts The date and time of the post.
+* @apiSuccess (Success) {Integer{0+}} upvotes Number of upvotes.
+* @apiSuccess (Success) {Integer{0+}} downvotes Number of downvotes.
+* @apiSuccess (Success) {Null} expiration Expiration date and time of the post.
 */
 function getPosts(type: 'all' | 'permanent' | 'temporary')
 {
@@ -127,9 +124,7 @@ function getPosts(type: 'all' | 'permanent' | 'temporary')
                 OFFSET $2`,
                 [items, page]);
 
-            res.status(200).json({
-                data: results.rows
-            });
+            res.status(200).json(results.rows);
         }
         catch (err)
         {
@@ -147,15 +142,14 @@ function getPosts(type: 'all' | 'permanent' | 'temporary')
 *
 * @apiParam (UrlParameters) {Integer{1+}} id The post identifier.
 *
-* @apiSuccess (Success) {Object[]} data Array of objects containing data.
-* @apiSuccess (Success) {Integer{1+}} data.post_id Identifier of the post.
-* @apiSuccess (Success) {Integer{1+}} data.author Identifier of the author.
-* @apiSuccess (Success) {String} data.title Title of the post.
-* @apiSuccess (Success) {String} data.content Content of the post.
-* @apiSuccess (Success) {String{DateTimeISO}} data.ts The date and time of the post.
-* @apiSuccess (Success) {Integer{0+}} data.upvotes Number of upvotes.
-* @apiSuccess (Success) {Integer{0+}} data.downvotes Number of downvotes.
-* @apiSuccess (Success) {String/Null{DateTimeISO}} data.expiration Expiration date and time of the post.
+* @apiSuccess (Success) {Integer{1+}} post_id Identifier of the post.
+* @apiSuccess (Success) {Integer{1+}} author Identifier of the author.
+* @apiSuccess (Success) {String} title Title of the post.
+* @apiSuccess (Success) {String} content Content of the post.
+* @apiSuccess (Success) {String{DateTimeISO}} ts The date and time of the post.
+* @apiSuccess (Success) {Integer{0+}} upvotes Number of upvotes.
+* @apiSuccess (Success) {Integer{0+}} downvotes Number of downvotes.
+* @apiSuccess (Success) {String/Null{DateTimeISO}} expiration Expiration date and time of the post.
 */
 async function getPost(req: Request, res: Response)
 {
@@ -171,9 +165,7 @@ async function getPost(req: Request, res: Response)
             WHERE post_id = $1`,
             [postId]);
 
-        res.status(200).json({
-            data: results.rows[0]
-        });
+        res.status(200).json(results.rows[0]);
     }
     catch (err)
     {
@@ -194,8 +186,7 @@ async function getPost(req: Request, res: Response)
 * @apiParam (BodyParameters) {String} content Content of the post.
 * @apiParam (BodyParameters) {String{DateTimeISO}} [expiration] Expiration date of the post.
 *
-* @apiSuccess (Success) {Object[]} data Object containing data.
-* @apiSuccess (Success) {Integer{1+}} data.post_id Identifier of the post.
+* @apiSuccess (Success) {Integer{1+}} post_id Identifier of the post.
 */
 async function createPost(req: Request, res: Response)
 {
@@ -207,9 +198,7 @@ async function createPost(req: Request, res: Response)
             INSERT INTO posts.posts (author, title, content, expiration) VALUES ($1, $2, $3, $4) RETURNING post_id`,
             [req.decoded.userId, req.body.title, req.body.content, req.body.expiration]);
 
-        res.status(200).json({
-            data: results.rows[0]
-        });
+        res.status(200).json(results.rows[0]);
     }
     catch (err)
     {
@@ -352,12 +341,11 @@ async function deletePost(req: Request, res: Response)
 * @apiParam (QueryParameters) {Integer{0+}} [page] Page index to get.
 * @apiParam (QueryParameters) {Integer{1+}} [items] Number of element per page.
 *
-* @apiSuccess (Success) {Object[]} data Array of objects containing data.
-* @apiSuccess (Success) {Integer{1+}} data.comment_id Identifier of the comment.
-* @apiSuccess (Success) {Integer{1+}} data.post Identifier of the post.
-* @apiSuccess (Success) {Integer{1+}} data.author Identifier of the author.
-* @apiSuccess (Success) {String} data.content Content of the post.
-* @apiSuccess (Success) {String{DateTimeISO}} data.ts The date and time of the post.
+* @apiSuccess (Success) {Integer{1+}} comment_id Identifier of the comment.
+* @apiSuccess (Success) {Integer{1+}} post Identifier of the post.
+* @apiSuccess (Success) {Integer{1+}} author Identifier of the author.
+* @apiSuccess (Success) {String} content Content of the post.
+* @apiSuccess (Success) {String{DateTimeISO}} ts The date and time of the post.
 */
 async function getPostComments(req: Request, res: Response)
 {
@@ -381,9 +369,7 @@ async function getPostComments(req: Request, res: Response)
             OFFSET $3`,
             [postId, items, page]);
 
-        res.status(200).json({
-            data: results.rows
-        });
+        res.status(200).json(results.rows);
     }
     catch (err)
     {
@@ -400,12 +386,11 @@ async function getPostComments(req: Request, res: Response)
 *
 * @apiParam (UrlParameters) {Integer{1+}} id Identifier of the comment.
 * 
-* @apiSuccess (Success) {Object} data Object containing data.
-* @apiSuccess (Success) {Integer{1+}} data.comment_id Identifier of the comment.
-* @apiSuccess (Success) {Integer{1+}} data.post Identifier of the post.
-* @apiSuccess (Success) {Integer{1+}} data.author Identifier of the author.
-* @apiSuccess (Success) {String} data.content Content of the post.
-* @apiSuccess (Success) {String{DateTimeISO}} data.ts The date and time of the post.
+* @apiSuccess (Success) {Integer{1+}} comment_id Identifier of the comment.
+* @apiSuccess (Success) {Integer{1+}} post Identifier of the post.
+* @apiSuccess (Success) {Integer{1+}} author Identifier of the author.
+* @apiSuccess (Success) {String} content Content of the post.
+* @apiSuccess (Success) {String{DateTimeISO}} ts The date and time of the post.
 */
 async function getComment(req: Request, res: Response)
 {
@@ -421,9 +406,7 @@ async function getComment(req: Request, res: Response)
             WHERE comment_id = $1`,
             [commentId]);
 
-        res.status(200).json({
-            data: results.rows[0]
-        });
+        res.status(200).json(results.rows[0]);
     }
     catch (err)
     {
@@ -444,8 +427,7 @@ async function getComment(req: Request, res: Response)
 * 
 * @apiParam (BodyParameters) {String} content Content of the comment.
 *
-* @apiSuccess (Success) {Object[]} data Object containing data.
-* @apiSuccess (Success) {Integer{1+}} data.comment_id Identifier of the comment.
+* @apiSuccess (Success) {Integer{1+}} comment_id Identifier of the comment.
 */
 async function createPostComment(req: Request, res: Response)
 {
@@ -460,9 +442,7 @@ async function createPostComment(req: Request, res: Response)
             INSERT INTO posts.comments (author, post, content) VALUES ($1, $2, $3) RETURNING comment_id`,
             [req.decoded.userId, postId, req.body.content]);
 
-        res.status(200).json({
-            data: results.rows[0]
-        });
+        res.status(200).json(results.rows[0]);
     }
     catch (err)
     {
