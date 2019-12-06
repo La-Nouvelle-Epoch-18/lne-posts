@@ -6,7 +6,7 @@ CREATE TABLE posts.comments
 (
     comment_id serial,
     post integer NOT NULL,
-    author integer NOT NULL,
+    author character varying(40) NOT NULL,
     content text COLLATE pg_catalog."default" NOT NULL,
     ts timestamp(0) with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT comments_pkey PRIMARY KEY (comment_id),

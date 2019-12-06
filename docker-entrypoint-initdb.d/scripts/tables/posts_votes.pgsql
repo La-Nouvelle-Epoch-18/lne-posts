@@ -1,7 +1,7 @@
 CREATE TABLE posts.posts_votes
 (
     post integer NOT NULL,
-    author integer NOT NULL,
+    author character varying(40) NOT NULL,
     negative boolean NOT NULL,
     CONSTRAINT posts_votes_pkey PRIMARY KEY (post, author),
     CONSTRAINT "fk-posts_votes-posts" FOREIGN KEY (post)

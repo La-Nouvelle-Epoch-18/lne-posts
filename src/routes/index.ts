@@ -205,7 +205,7 @@ async function createPost(req: Request, res: Response)
     {
         const results = await query(`
             INSERT INTO posts.posts (author, title, content, expiration) VALUES ($1, $2, $3, $4) RETURNING post_id`,
-            [req.decoded.id, req.body.title, req.body.content, req.body.expiration]);
+            [req.decoded.userId, req.body.title, req.body.content, req.body.expiration]);
 
         res.status(200).json({
             data: results.rows[0]
@@ -250,7 +250,7 @@ async function editPost(req: Request, res: Response)
             return;
         }
 
-        if (checkResult.rows[0].author !== req.decoded.id)
+        if (checkResult.rows[0].author !== req.decoded.userId)
         {
             res.status(403).json({
                 error: "Cannot edit this post"
@@ -323,7 +323,7 @@ async function deletePost(req: Request, res: Response)
             return;
         }
 
-        if (checkResult.rows[0].author !== req.decoded.id)
+        if (checkResult.rows[0].author !== req.decoded.userId)
         {
             res.status(403).json({
                 error: "Cannot edit this post"
@@ -458,7 +458,7 @@ async function createPostComment(req: Request, res: Response)
     {
         const results = await query(`
             INSERT INTO posts.comments (author, post, content) VALUES ($1, $2, $3) RETURNING comment_id`,
-            [req.decoded.id, postId, req.body.content]);
+            [req.decoded.userId, postId, req.body.content]);
 
         res.status(200).json({
             data: results.rows[0]
@@ -502,7 +502,7 @@ async function editPostComment(req: Request, res: Response)
             return;
         }
 
-        if (checkResult.rows[0].author !== req.decoded.id)
+        if (checkResult.rows[0].author !== req.decoded.userId)
         {
             res.status(403).json({
                 error: "Cannot delete this Comment"
@@ -550,7 +550,7 @@ async function deleteComment(req: Request, res: Response)
             return;
         }
 
-        if (checkResult.rows[0].author !== req.decoded.id)
+        if (checkResult.rows[0].author !== req.decoded.userId)
         {
             res.status(403).json({
                 error: "Cannot delete this comment"
@@ -602,15 +602,15 @@ async function voteForPost(req: Request, res: Response)
 
         let points = 0;
 
-        const results = await query(`SELECT negative FROM posts.posts_votes WHERE post = $1 AND author = $2`, [postId, req.decoded.id]);
+        const results = await query(`SELECT negative FROM posts.posts_votes WHERE post = $1 AND author = $2`, [postId, req.decoded.userId]);
         if (results.rowCount == 0)
         {
-            await query(`INSERT INTO posts.posts_votes (post, author, negative) VALUES ($1, $2, $3)`, [postId, req.decoded.id, negative]);
+            await query(`INSERT INTO posts.posts_votes (post, author, negative) VALUES ($1, $2, $3)`, [postId, req.decoded.userId, negative]);
             points = negative ? -1 : 1;
         }
         else if (results.rows[0].negative != negative)
         {
-            await query(`UPDATE posts.posts_votes SET negative = $3 WHERE post = $1 AND author = $2`, [postId, req.decoded.id, negative]);
+            await query(`UPDATE posts.posts_votes SET negative = $3 WHERE post = $1 AND author = $2`, [postId, req.decoded.userId, negative]);
             points = negative ? -2 : 2;
         }
 

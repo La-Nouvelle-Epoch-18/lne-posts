@@ -10,22 +10,27 @@ export async function authenticated(req: Request, res: Response, next: NextFunct
     const token = extractAuthToken(req);
     if (token)
     {
-        console.log(token);
         try
         {
             const result = await requestP({
-                method: 'GET',
-                url: AUTH_SERVICE_URL,
+                method: 'POST',
+                url: AUTH_SERVICE_URL + "/auth/verify",
                 headers: {
-                    "authorization": "Bearer " + token
+                    "authorization": "bearer " + token
                 }
-            })
+            });
             if (result.statusCode == 200)
             {
-                const data: any = jwt.decode(token) || { id: 1 };
-                req.decoded = data;
-                console.log(data);
-                next();
+                const data = jwt.decode(token);
+                if(data)
+                {
+                    req.decoded = data as any;
+                    next();
+                }
+                else
+                {
+
+                }
             }
             else
             {

@@ -1,7 +1,7 @@
 CREATE TABLE posts.posts
 (
     post_id serial,
-    author integer NOT NULL,
+    author character varying(40) NOT NULL,
     title character varying(255) COLLATE pg_catalog."default" NOT NULL,
     content text COLLATE pg_catalog."default" NOT NULL,
     ts timestamp(0) with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
