@@ -29,7 +29,9 @@ export async function authenticated(req: Request, res: Response, next: NextFunct
                 }
                 else
                 {
-
+                    res.status(result.statusCode).json({
+                        error: "Invalid token"
+                    });
                 }
             }
             else
